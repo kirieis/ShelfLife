@@ -24,8 +24,8 @@ export default function LoginPage() {
 
   // Validation logic
   const getEmailError = (val: string) => {
-    if (!val.trim()) return "Email is required"
-    if (!isValidEmail(val)) return "Please enter a valid email address"
+    if (!val || val.trim() === "") return "Email is required"
+    if (!isValidEmail(val.trim())) return "Please enter a valid email address"
     return ""
   }
 
@@ -52,14 +52,14 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       })
 
       if (error) {
         setAuthError(error.message)
       } else if (data.session) {
-        router.push("/expenses")
+        router.push("/books")
       }
     } catch (err: any) {
       setAuthError(err.message || "An unexpected error occurred")
@@ -89,7 +89,10 @@ export default function LoginPage() {
                 type="email"
                 data-testid="login-email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (authError) setAuthError("")
+                }}
               />
               {emailError && (
                 <p data-testid="error-email" className="text-sm text-red-600">
@@ -105,7 +108,10 @@ export default function LoginPage() {
                 type="password"
                 data-testid="login-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  if (authError) setAuthError("")
+                }}
               />
               {passwordError && (
                 <p data-testid="error-password" className="text-sm text-red-600">
@@ -124,7 +130,7 @@ export default function LoginPage() {
             </Button>
 
             <p className="text-sm text-center text-gray-600 mt-4">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/register" className="text-blue-600 hover:underline">
                 Register
               </Link>
@@ -135,4 +141,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

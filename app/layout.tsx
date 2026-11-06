@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { BookProvider } from "@/context/BookContext";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "SpendWise",
-  description: "SpendWise expense tracker application",
+  title: "ShelfLife",
+  description: "ShelfLife book tracking application",
 };
 
 export default function RootLayout({
@@ -17,8 +18,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-gray-50 flex flex-col text-gray-900">
         <AuthProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
+          <BookProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+          </BookProvider>
         </AuthProvider>
       </body>
     </html>

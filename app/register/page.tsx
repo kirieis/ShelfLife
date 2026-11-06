@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
@@ -14,7 +13,6 @@ function isValidEmail(email: string) {
 }
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -26,8 +24,8 @@ export default function RegisterPage() {
 
   // Validation logic
   const getEmailError = (val: string) => {
-    if (!val.trim()) return "Email is required"
-    if (!isValidEmail(val)) return "Please enter a valid email address"
+    if (!val || val.trim() === "") return "Email is required"
+    if (!isValidEmail(val.trim())) return "Please enter a valid email address"
     return ""
   }
 
@@ -64,7 +62,7 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
       })
 
@@ -106,7 +104,10 @@ export default function RegisterPage() {
                 type="email"
                 data-testid="register-email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (authError) setAuthError("")
+                }}
               />
               {emailError && (
                 <p data-testid="error-email" className="text-sm text-red-600">
@@ -122,7 +123,10 @@ export default function RegisterPage() {
                 type="password"
                 data-testid="register-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  if (authError) setAuthError("")
+                }}
               />
               {passwordError && (
                 <p data-testid="error-password" className="text-sm text-red-600">
@@ -138,7 +142,10 @@ export default function RegisterPage() {
                 type="password"
                 data-testid="register-confirm-password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value)
+                  if (authError) setAuthError("")
+                }}
               />
               {confirmPasswordError && (
                 <p data-testid="error-confirm-password" className="text-sm text-red-600">
@@ -168,4 +175,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-
