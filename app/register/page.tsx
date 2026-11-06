@@ -69,7 +69,12 @@ export default function RegisterPage() {
       if (error) {
         setAuthError(error.message)
       } else if (data.user) {
-        setSuccessMessage("Registration successful")
+        // If Supabase returns empty identities (user already registered with email enumeration protection)
+        if (data.user.identities && data.user.identities.length === 0) {
+          setAuthError("User already registered")
+        } else {
+          setSuccessMessage("Registration successful")
+        }
       }
     } catch (err: any) {
       setAuthError(err.message || "An unexpected error occurred")

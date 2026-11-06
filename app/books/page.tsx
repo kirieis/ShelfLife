@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/context/AuthContext"
 import { useBooks, Book } from "@/context/BookContext"
 import { Button } from "@/components/ui/button"
@@ -13,6 +14,7 @@ export default function BooksPage() {
   const { user, loading: authLoading } = useAuth()
   const { books, addBook, advanceStatus, deleteBook } = useBooks()
   const router = useRouter()
+  const [checking, setChecking] = useState(true)
 
   // Form state
   const [title, setTitle] = useState("")
@@ -31,12 +33,21 @@ export default function BooksPage() {
 
   // Authentication guard: prevent flash of content or wrong redirect
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace("/login")
+    if (!authLoading) {
+      if (!user) {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!session?.user) {
+            router.replace("/login")
+          }
+          setChecking(false)
+        })
+      } else {
+        setChecking(false)
+      }
     }
   }, [user, authLoading, router])
 
-  if (authLoading || !user) {
+  if (authLoading || checking || !user) {
     return null
   }
 
